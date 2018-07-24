@@ -7,16 +7,17 @@ WiFiClient espClient;
 HTTPClient http;
 
 //Dados de Wifi
-const char* WIFI_SSID = "";
+const char* WIFI_SSID = "Guest";
 const char* WIFI_PASS = "";
 
 // Dados do servidor
 const char* USER = "";
-const char* PWD = "";
+const char* PWD = ""; 
 const char* PUB_pir = "";
 
-//GPIO usado para o sensor de presenca
-int presence_gpio = 4;
+//GPIO usado para o sensor de presenca (D1)
+int presence_gpio = D1;
+int led_pin = D3;
 
 //Variaveis gloabais desse codigo
 char bufferJ[256];
@@ -38,12 +39,24 @@ void handleInterrupt4() {
   //Serial.println("Interrupt GPIO4 !!!");
   mov++;
 }
+
+void blink(int interval)
+{
+  Serial.print("blink ");
+  Serial.println(interval);
+  
+  digitalWrite(led_pin, HIGH);
+  delay(interval);
+  digitalWrite(led_pin, LOW);
+  delay(interval);
+}
   
 void check_connection() 
 {
   int i =0;
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
+    blink(100);
     i++;
     Serial.print(".");
     if (i > 100) ESP.deepSleep(300*1000000, WAKE_RF_DEFAULT); //Tentar conectar por 50 segundos, caso nao consiga, dormir por 5 minutos
@@ -53,7 +66,9 @@ void check_connection()
 void setup()
 {
   pinMode(presence_gpio, INPUT);
+  pinMode(led_pin, OUTPUT);
   Serial.begin(115200);
+  blink(500);
   WiFi.begin(WIFI_SSID,WIFI_PASS);
   check_connection();
   http.addHeader("Content-Type", "application/json");
@@ -78,6 +93,7 @@ void loop()
   httpCode=http.POST(jsonMQTTmsgDATAint("movement_detector", "Number", mov));
   Serial.println(httpCode);
   http.end();
+  blink(200);
   mov=0;
 }
 
