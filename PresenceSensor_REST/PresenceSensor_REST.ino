@@ -13,7 +13,7 @@ const char* WIFI_PASS = "";
 // Dados do servidor
 const char* USER = "";
 const char* PWD = ""; 
-const char* PUB_pir = "";
+const char* PUB_pir = "/pub/<USER>/pir";
 
 //GPIO usado para o sensor de presenca (D1)
 int presence_gpio = D1;
@@ -23,6 +23,8 @@ int led_pin = D3;
 char bufferJ[256];
 int httpCode = 0;
 int mov=0;
+int sensorValue=0;
+int i = 0;
 
 char *jsonMQTTmsgDATAint(const char *device_id, const char *metric, int value)
   {
@@ -35,11 +37,6 @@ char *jsonMQTTmsgDATAint(const char *device_id, const char *metric, int value)
         return bufferJ;
   }
   
-void handleInterrupt4() {
-  //Serial.println("Interrupt GPIO4 !!!");
-  mov++;
-}
-
 void blink(int interval)
 {
   Serial.print("blink ");
@@ -59,7 +56,7 @@ void check_connection()
     blink(100);
     i++;
     Serial.print(".");
-    if (i > 100) ESP.deepSleep(300*1000000, WAKE_RF_DEFAULT); //Tentar conectar por 50 segundos, caso nao consiga, dormir por 5 minutos
+    if (i > 100) delay(5*60*1000); 
   }
 }
 
@@ -69,6 +66,7 @@ void setup()
   pinMode(led_pin, OUTPUT);
   Serial.begin(115200);
   blink(500);
+  mov = -1;
   WiFi.begin(WIFI_SSID,WIFI_PASS);
   check_connection();
   http.addHeader("Content-Type", "application/json");
@@ -80,20 +78,24 @@ void setup()
 
 void loop()
 {
-  WiFi.forceSleepBegin(60000000);
-  delay(1);
-  attachInterrupt(digitalPinToInterrupt(presence_gpio), handleInterrupt4, RISING);
-  delay(60000);
-  detachInterrupt(digitalPinToInterrupt(presence_gpio));
-  WiFi.forceSleepWake();
-  delay(1);
-  Serial.println("Sending data!");
-  check_connection();
-  http.begin("data.demo.konkerlabs.net",80,PUB_pir);
-  httpCode=http.POST(jsonMQTTmsgDATAint("movement_detector", "Number", mov));
-  Serial.println(httpCode);
-  http.end();
-  blink(200);
-  mov=0;
+ WiFi.forceSleepBegin(60000000);
+ delay(1);
+ sensorValue=0;
+ for (i=0; i<60000; i++)
+   {
+     sensorValue+= digitalRead(presence_gpio);
+     delay(1);
+   }
+ WiFi.forceSleepWake();
+ delay(1);
+ Serial.println("Sending data!");
+ Serial.print("Count: ");
+ Serial.println(sensorValue);
+ check_connection();
+ http.begin("data.demo.konkerlabs.net",80,PUB_pir);
+ httpCode=http.POST(jsonMQTTmsgDATAint("movement_detector", "Number", sensorValue));
+ Serial.println(httpCode);
+ http.end();
+ blink(200);
+ mov=0;
 }
-
