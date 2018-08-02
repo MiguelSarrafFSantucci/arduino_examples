@@ -7,13 +7,13 @@ WiFiClient espClient;
 HTTPClient http;
 
 //Dados de Wifi
-const char* WIFI_SSID = "Guest";
+const char* WIFI_SSID = "";
 const char* WIFI_PASS = "";
 
 // Dados do servidor
 const char* USER = "";
 const char* PWD = ""; 
-const char* PUB_pir = "/pub/<USER>/pir";
+const char* PUB_pir = "/pub/<user>/pir";
 
 //GPIO usado para o sensor de presenca (D1)
 int presence_gpio = D1;
@@ -25,6 +25,7 @@ int httpCode = 0;
 int mov=0;
 int sensorValue=0;
 int i = 0;
+int connection_error = 0;
 
 char *jsonMQTTmsgDATAint(const char *device_id, const char *metric, int value)
   {
@@ -33,6 +34,7 @@ char *jsonMQTTmsgDATAint(const char *device_id, const char *metric, int value)
         jsonMSG["name"] = device_id;
         jsonMSG["metric"] = metric;
         jsonMSG["value"] = value;
+        jsonMSG["conn_err"] = connection_error;
         jsonMSG.printTo(bufferJ, sizeof(bufferJ));
         return bufferJ;
   }
@@ -56,7 +58,17 @@ void check_connection()
     blink(100);
     i++;
     Serial.print(".");
-    if (i > 100) delay(5*60*1000); 
+    if (i > 100) { 
+      Serial.println("waiting to connect (1 minute)");
+      Serial.print("WIFI: ");
+      Serial.println(WIFI_SSID);
+      Serial.print("PASSWD: '");
+      Serial.print(WIFI_PASS);
+      Serial.println("'");
+      delay(1*60*1000); 
+      i = 0;
+      connection_error++;
+    }
   }
 }
 
