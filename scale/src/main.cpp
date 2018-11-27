@@ -51,13 +51,13 @@ void loop() {
 
     if (scale.getState()) {
         scale.read();
+        m = scale.getCurrent();
+
+        Serial.println(m->weight());
     }
     else  {
         Serial.println("setting up scale...");
         scale.begin();
-        m = scale.getCurrent();
-
-        Serial.println(m->weight());
     }
     yield();
 
