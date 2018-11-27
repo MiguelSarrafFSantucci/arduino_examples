@@ -18,6 +18,7 @@
 
 #include "Arduino.h"
 #include "scale.h"
+#include "measurement.h"
 
 #define __APP_VERSION__ "1.6"
 
@@ -46,12 +47,17 @@ void setup() {
  */
 void loop() {
 
+    Measurement *m; 
+
     if (scale.getState()) {
         scale.read();
     }
     else  {
         Serial.println("setting up scale...");
         scale.begin();
+        m = scale.getCurrent();
+
+        Serial.println(m->weight());
     }
     yield();
 
