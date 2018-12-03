@@ -1,4 +1,24 @@
 # encoding: utf-8
+
+# usage: 
+#    please, define the following ENVIRONMENT VARIABLES to 
+#    configure this script:
+#
+#    FLAG = identify which compilation FLAGs should be used 
+#      ... RESETALL - to reset all configuration
+#      ... NO_AUTOREGISTRY - to remove auto registration for each device
+#
+#    KONKER_USER=<username>
+#      ... define the device's username on the platform 
+#    KONKER_PASSWD=<pwd> 
+#      ... define device's password on the platform
+#    WS<#>=<SSID> WP<#>=<PASSWORD>
+#      ... where <#> is the # ... 1, 2, 3, 4 ... of the network
+#      ... <SSID> name of the network
+#      ... <PASSWORD> used to connect to the correspondent SSID
+#
+#
+
 import os.path
 import subprocess
 
@@ -29,9 +49,25 @@ def get_git_hash():
 
     return GIT_REVISION
 
+def setFlag(flag):
+    v = os.environ.get(flag) or None
+    if (v):
+        return '-D_{}=\'"{}"\' '.format(flag, v)
+    return ''
+
+
 if __name__ == '__main__':
+    flag = ''
+    flag = '{}{}'.format(flag, setFlag('WS1'))
+    flag = '{}{}'.format(flag, setFlag('WP1'))
+    flag = '{}{}'.format(flag, setFlag('WS2'))
+    flag = '{}{}'.format(flag, setFlag('WP2'))
+    flag = '{}{}'.format(flag, setFlag('WS3'))
+    flag = '{}{}'.format(flag, setFlag('WP3'))
+    flag = '{}{}'.format(flag, setFlag('KONKER_USER'))
+    flag = '{}{}'.format(flag, setFlag('KONKER_PASSWD'))
+
     if os.environ.get('FLAG'):
-        flag='-D{}'.format(os.environ.get('FLAG'))
-    else:
-        flag=''
+        flag='{}-D{}'.format(flag, os.environ.get('FLAG'))
+    
     print('-g3 -DPIO_SRC_REV=\'"%s"\' %s' % (get_git_hash(), flag))
