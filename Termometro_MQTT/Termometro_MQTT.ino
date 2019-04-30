@@ -49,16 +49,15 @@ float resistencia_termistor;
 int i = 0;
 
 //Vamos criar uma funcao para formatar os dados no formato JSON
-char *jsonMQTTmsgDATA(const char *device_id, const char *metric, float value)
-  {
-      StaticJsonBuffer<200> jsonMQTT;
-      JsonObject& jsonMSG = jsonMQTT.createObject();
-        jsonMSG["deviceId"] = device_id;
-        jsonMSG["metric"] = metric;
-        jsonMSG["value"] = value;
-        jsonMSG.printTo(bufferJ, sizeof(bufferJ));
-        return bufferJ;
-  }
+char *jsonMQTTmsgDATA(const char *device_id, const char *metric, float value) {
+	const int capacity = JSON_OBJECT_SIZE(3);
+	StaticJsonDocument<capacity> jsonMSG;
+	jsonMSG["deviceId"] = device_id;
+	jsonMSG["metric"] = metric;
+	jsonMSG["value"] = value;
+	serializeJson(jsonMSG, bufferJ);
+	return bufferJ;
+}
 
 //Criando os objetos de conexão com a rede e com o servidor MQTT.
 WiFiClient espClient;
