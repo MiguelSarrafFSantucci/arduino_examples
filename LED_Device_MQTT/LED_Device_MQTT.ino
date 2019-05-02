@@ -43,12 +43,22 @@ PubSubClient client(espClient);
 
 float jsonMQTT_temperature_msg(const char msg[])
 {
-  float temperatura;
-  StaticJsonBuffer<2048> jsonBuffer;
-  JsonObject& jsonMSG = jsonBuffer.parseObject(msg);
-  if (jsonMSG.containsKey("value")) temperatura = jsonMSG["value"].as<float>();
-  return temperatura;
+   const int capacity = JSON_OBJECT_SIZE(3);
+   float temperatura;
+   StaticJsonDocument<capacity> jsonMSG;
+   DeserializationError err = deserializeJson(jsonMSG, msg);
+   if (err)
+   {
+     Serial.println("ERRO.");
+     return 0;
+   }
+   if (jsonMSG.containsKey("value")) 
+   { 
+     temperatura = jsonMSG["value"].as<float>();
+   }   
+   return temperatura;
 }
+
 
 
 //Criando a função de callback
