@@ -167,6 +167,8 @@ void setup()
       setWifiCredentialsNotEncripted((char*)WIFI_SSID, (char*)WIFI_PASS, 
         (char*)WIFI2_SSID, (char*)WIFI2_PASS, 
         (char*)WIFI3_SSID, (char*)WIFI3_PASS);
+    #else
+      Serial.println("USING AUTO_REGISTRY");
     #endif 
 
     // set_factory_wifi("KonkerDevNetwork", "");
