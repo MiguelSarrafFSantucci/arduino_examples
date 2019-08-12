@@ -1,7 +1,4 @@
 #include <Arduino.h>
-// #include <ESP8266WiFi.h>
-// #include <ArduinoJson.h> 
-// #include <ESP8266HTTPClient.h>
 #include "konker.h"
 
 // #define AUTO_REGISTRY
@@ -9,6 +6,7 @@
 // local configuration 
 #define FREQUENCY 60000
 #define WIFI_RETRIES  40
+// #define DEBUG_MSG
 
 #ifndef AUTO_REGISTRY
 
@@ -56,9 +54,9 @@ const char* PWD = "";
 #endif 
 
 // Dados do servidor
-const char* KONKER_SERVER_URL = "data.demo.konkerlabs.net";
+char* KONKER_SERVER_URL = "data.demo.konkerlabs.net";
 const int KONKER_SERVER_PORT = 80;
-const char* SENSOR_TYPE = "S2V02";
+char* SENSOR_TYPE = "S2V02";
 
 //GPIO usado para o sensor de presenca (D1)
 const int presence_gpio = D1;
