@@ -7,7 +7,7 @@
 #define FREQUENCY 60000
 #define WIFI_RETRIES  40
 // #define DEBUG_MSG
-
+// #define RESETALL
 #ifndef AUTO_REGISTRY
 
 //Dados de Wifi
@@ -55,7 +55,7 @@ const char* PWD = "";
 
 // Dados do servidor
 char* KONKER_SERVER_URL = "data.demo.konkerlabs.net";
-const int KONKER_SERVER_PORT = 80;
+char* KONKER_SERVER_PORT = "80";
 char* SENSOR_TYPE = "S2V02";
 
 //GPIO usado para o sensor de presenca (D1)
@@ -145,13 +145,10 @@ bool WiFi_Off()
 {
   int conn_tries = 0; 
   
-  WiFi.disconnect();
-  delay(10);
   WiFi.mode(WIFI_OFF);
   delay(10);
   WiFi.forceSleepBegin();
   delay(10);
-  yield();
 
   while ((WiFi.status() == WL_CONNECTED) && (conn_tries++ < WIFI_RETRIES))
   {
@@ -186,14 +183,11 @@ void setup()
   Serial.println("JUST TO RESET CONFIGURATION");
   resetALL();
 #else
-  char server_port[255];
-  snprintf(server_port, 254, "%d", KONKER_SERVER_PORT);
-
   pinMode(presence_gpio, INPUT);
   pinMode(led_pin, OUTPUT);
 
   Serial.begin(115200);
-  while (!Serial) continue;
+  while (!Serial) delay(100);
 #ifdef DEBUG_MSG
   Serial.println(F("\n"));    // <CR> past boot messages.
   Serial.print("Starting SENSOR REVISION ");
@@ -211,7 +205,7 @@ void setup()
   Serial.print("WIFI_PASS: ");
   Serial.println(WIFI_PASS);
 #endif
-  set_platform_credentials((char*)KONKER_SERVER_URL, server_port, (char*)USER, (char*)PWD, "data");
+  set_platform_credentials((char*)KONKER_SERVER_URL, (char*)KONKER_SERVER_PORT, (char*)USER, (char*)PWD, "data");
   setWifiCredentialsNotEncripted((char*)WIFI_SSID, (char*)WIFI_PASS, 
     (char*)WIFI2_SSID, (char*)WIFI2_PASS, 
     (char*)WIFI3_SSID, (char*)WIFI3_PASS);
@@ -232,6 +226,7 @@ void setup()
   WiFi.persistent(false); 
 
   check_connection();
+
 #ifdef DEBUG_MSG
   Serial.println("Setup finished");
 #endif
@@ -285,7 +280,6 @@ void loop()
     }
     sensorValue = 0;
     freq_cnt = 0;
-    ESP.wdtFeed();
   }
 #endif
 }
