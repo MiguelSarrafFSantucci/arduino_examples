@@ -272,12 +272,15 @@ void loop()
 
       blink(200);
       mov=0;
-      (void)WiFi_Off();
+      
 #ifdef DEBUG_MSG
       Serial.println("WiFi Off");
       Stat_WiFi();
 #endif
     }
+    
+    (void)WiFi_Off();
+
     sensorValue = 0;
     freq_cnt = 0;
   }
