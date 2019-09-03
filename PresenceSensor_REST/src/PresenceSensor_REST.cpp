@@ -56,7 +56,7 @@ const char* PWD = "";
 // Dados do servidor
 char* KONKER_SERVER_URL = "data.demo.konkerlabs.net";
 char* KONKER_SERVER_PORT = "80";
-char* SENSOR_TYPE = "S3V02";
+char* SENSOR_TYPE = "S2V02";
 
 //GPIO usado para o sensor de presenca (D1)
 const int presence_gpio = D1;
