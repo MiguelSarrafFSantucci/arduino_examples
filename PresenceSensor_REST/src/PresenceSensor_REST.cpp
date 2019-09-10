@@ -211,21 +211,22 @@ void setup()
     (char*)WIFI3_SSID, (char*)WIFI3_PASS);
 #else
     Serial.println("USING AUTO_REGISTRY");
-#endif 
+#endif
 
   // set_factory_wifi("KonkerDevNetwork", "");
   // set_factory_gateway_addr("0.0.0.0:8081");
   
-  konkerConfig(KONKER_SERVER_URL,SENSOR_TYPE,false);
+  konkerConfig(KONKER_SERVER_URL, SENSOR_TYPE, false);
 
+  WiFi.persistent(false);
   WiFi.disconnect();
   delay(10);
-  WiFi.persistent(false);
   WiFi.setAutoConnect(false);
-  WiFi.setAutoReconnect(false);
-  WiFi.setSleepMode(WIFI_NONE_SLEEP);  
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);
+  WiFi.setOutputPower(20.5f);
 
   check_connection();
+  WiFi.setAutoReconnect(false);
 
 #ifdef DEBUG_MSG
   Serial.println("Setup finished");
