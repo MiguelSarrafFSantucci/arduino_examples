@@ -10,17 +10,14 @@
 #define HEALTH_TIME    300
 
 
-const char *ssid   = "SmartCity";         // WIFI (SSID)
-const char *password = "Melicidade@18";   // WIFI password
-
-// const char *ssid   = "yellow";
-// const char *password = "!yellow2016";
+const char *ssid   = "";         // WIFI (SSID)
+const char *password = "";   // WIFI password
 
 // Dados da plataforma
+const char* USER = "";
+const char* PWD = "";
 const char* KONKER_SERVER_URL = "data.demo.konkerlabs.net";
 const int KONKER_SERVER_PORT = 80;
-const char* USER = "4opgsri6v373";
-const char* PWD = "Cdy1liWLvRWh";
 
 Ticker send_health;
 
@@ -143,7 +140,7 @@ void checkDoorState()
 
             if (WiFi.status() == WL_CONNECTED)
             {
-                pubHTTP("sensor", sensor_json);
+                pubHTTP("DOOR", sensor_json);
             }
             else
             {
