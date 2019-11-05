@@ -49,14 +49,14 @@ const char* USER = "";
 #ifdef _KONKER_PASSWD
 const char* PWD = _KONKER_PASSWD; 
 #else
-const char* PWD = ""; 
+const char* PWD = "";
 #endif
 #endif 
 
 // Dados do servidor
 char* KONKER_SERVER_URL = "data.demo.konkerlabs.net";
 char* KONKER_SERVER_PORT = "80";
-char* SENSOR_TYPE = "S2V02";
+char* SENSOR_TYPE = "S2V04";
 
 //GPIO usado para o sensor de presenca (D1)
 const int presence_gpio = D1;
@@ -137,7 +137,6 @@ bool WiFi_On()
     Serial.println("[WF_ER] ON");
   }
 #endif
-
   return con_st;
 }
 
@@ -216,8 +215,6 @@ void setup()
   // set_factory_wifi("KonkerDevNetwork", "");
   // set_factory_gateway_addr("0.0.0.0:8081");
   
-  konkerConfig(KONKER_SERVER_URL, SENSOR_TYPE, false);
-
   WiFi.persistent(false);
   WiFi.disconnect();
   delay(10);
@@ -225,7 +222,8 @@ void setup()
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.setOutputPower(20.5f);
 
-  check_connection();
+  konkerConfig(KONKER_SERVER_URL, SENSOR_TYPE, false);
+
   WiFi.setAutoReconnect(false);
 
 #ifdef DEBUG_MSG
