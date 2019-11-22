@@ -10,7 +10,7 @@
 #define HEALTH_TIME    300
 
 
-const char *ssid   = "";         // WIFI (SSID)
+const char *ssid   = "";    // WIFI (SSID)
 const char *password = "";   // WIFI password
 
 // Dados da plataforma
@@ -21,6 +21,8 @@ const int KONKER_SERVER_PORT = 80;
 
 Ticker send_health;
 
+int last_http_err[3] = {0};
+uint32_t pub_errors = 0;
 int connection_errors = 0;
 unsigned long ref_open_time = 0;
 int health_flag = 0;
@@ -38,6 +40,8 @@ int pubHTTP(String channel, const String & message)
     // Serial.print("PUB_DIR = ");
     // Serial.println(pub_dir);
 
+    http.setTimeout(10000);
+
     if (http.begin(client, KONKER_SERVER_URL, KONKER_SERVER_PORT, pub_dir))
     {
         http.addHeader("Content-Type", "application/json");
@@ -52,7 +56,18 @@ int pubHTTP(String channel, const String & message)
             // Serial.print("HTTP resp: ");
             // Serial.println(payload);
         }
+        else
+        {
+            ++pub_errors;
+            last_http_err[0] = last_http_err[1];
+            last_http_err[1] = last_http_err[2];
+            last_http_err[2] = httpCode;
+        }
         http.end();
+    }
+    else
+    {
+        Serial.println("HTTP begin error!");
     }
 
     return httpCode;
@@ -87,6 +102,10 @@ String jsonHealth(uint32_t conn_er, const String & net, const String & mac, cons
 
   JsonObject errors = root.createNestedObject("errors");
   errors["connection"] = conn_er;
+  errors["pub"] = pub_errors;
+  errors["err1"] = last_http_err[2];
+  errors["err2"] = last_http_err[1];
+  errors["err3"] = last_http_err[0];
 
   serializeJson(jsonMSG, output);
 
@@ -126,6 +145,7 @@ void checkDoorState()
             if (reedState == HIGH)
             {
                 sensor_json = jsonSensor(!reedState, millis() - ref_open_time);
+                digitalWrite(LED_BUILTIN, HIGH);
 
                 // Serial.println("Fechado");
             }
@@ -134,6 +154,7 @@ void checkDoorState()
                 ref_open_time = millis();                
 
                 sensor_json = jsonSensor(!reedState, 0);
+                digitalWrite(LED_BUILTIN, LOW);
 
                 // Serial.println("Aberto");
             }
@@ -198,6 +219,9 @@ void setup()
     Serial.println();
 
     send_health.attach(HEALTH_TIME, health_msg);
+
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, LOW);
 
     delay(1000);
 
