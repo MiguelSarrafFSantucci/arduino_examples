@@ -178,9 +178,18 @@ void loop()
         else digitalWrite(PIN03, LOW);
     last_timestamp = timestamp;
     }
-   Serial.println("");
+    else{
+          digitalWrite(PIN01, LOW);
+          digitalWrite(PIN02, LOW);
+          digitalWrite(PIN03, LOW);
+    }
   }
-  
+  else{
+    digitalWrite(PIN01, LOW);
+    digitalWrite(PIN02, LOW);
+    digitalWrite(PIN03, LOW);
+  }
+  Serial.println("");
   //Gerando um delay de 2 segundos antes do loop recomecar
   delay(2000);
 }
