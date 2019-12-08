@@ -111,6 +111,13 @@ void setup_wifi() {
   Serial.println("WiFi conectado");
   Serial.println("Endereco de IP: ");
   Serial.println(WiFi.localIP());
+  http.begin("data.demo.konkerlabs.net",80,http_subscription_url);
+  httpCode = http.GET();
+  if (httpCode>0) {
+    payload = http.getString();
+    received_temperature = jsonMQTT_temperature_msg(payload);
+    last_timestamp = timestamp;
+  }
 }
 
 void setup()
@@ -121,6 +128,7 @@ void setup()
   http.addHeader("Content-Type", "application/json");
   http.addHeader("Accept", "application/json");
   http.setAuthorization(USER, PWD);
+  
 }
 
 void loop()
