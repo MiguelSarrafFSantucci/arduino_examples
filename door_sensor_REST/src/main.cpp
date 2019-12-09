@@ -223,6 +223,8 @@ void setup()
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, LOW);
 
+    pinMode(REED_PIN, INPUT);
+
     delay(1000);
 
     ref_open_time = millis();
