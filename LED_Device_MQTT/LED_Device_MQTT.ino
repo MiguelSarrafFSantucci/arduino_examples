@@ -43,7 +43,7 @@ PubSubClient client(espClient);
 
 float jsonMQTT_temperature_msg(const char msg[])
 {
-   const int capacity = JSON_OBJECT_SIZE(3);
+   const int capacity = 4*JSON_OBJECT_SIZE(3);
    float temperatura;
    StaticJsonDocument<capacity> jsonMSG;
    DeserializationError err = deserializeJson(jsonMSG, msg);
