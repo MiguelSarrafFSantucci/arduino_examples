@@ -34,8 +34,12 @@ const char* SUB = "";
 char msgBufferIN[2048];
 char msgTopic[32];
 int received_msg=0;
-
-float temperature=0;
+#if ARDUINOJSON_VERSION_MAJOR==5
+  #define AJVERSION5
+#endif
+#if ARDUINOJSON_VERSION_MAJOR==6
+  #define AJVERSION6
+#endif
 
 //Criando os objetos de conexão com a rede e com o servidor MQTT.
 WiFiClient espClient;
@@ -43,16 +47,25 @@ PubSubClient client(espClient);
 
 float jsonMQTT_temperature_msg(const char msg[])
 {
-   const int capacity = JSON_OBJECT_SIZE(3);
    float temperatura;
-   StaticJsonDocument<capacity> jsonMSG;
-   DeserializationError err = deserializeJson(jsonMSG, msg);
-   if (err)
-   {
+   #ifdef AJVERSION5
+   DynamicJsonBuffer jb;
+   JsonObject& jsonMSG=jb.parseObject(msg);
+   if(!jsonMSG.success()){
      Serial.println("ERRO.");
      return 0;
    }
-   if (jsonMSG.containsKey("value")) 
+   #endif
+   #ifdef AJVERSION6
+   const int capacity = 4*JSON_OBJECT_SIZE(3);
+   StaticJsonDocument<capacity> jsonMSG;
+   DeserializationError err = deserializeJson(jsonMSG, msg);
+   if (err){
+     Serial.println("ERRO.");
+     return 0;
+   }
+   #endif
+   if (jsonMSG.containsKey("value"))
    { 
      temperatura = jsonMSG["value"].as<float>();
    }   
@@ -132,7 +145,6 @@ void setup()
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
-
 }
 
 void loop()
@@ -148,7 +160,7 @@ void loop()
   if (received_msg==1)
     {
       received_msg=0;
-      temperature = jsonMQTT_temperature_msg(msgBufferIN);
+      float temperature = jsonMQTT_temperature_msg(msgBufferIN);
       if (temperature>10.0) digitalWrite(PIN01, HIGH);
       else digitalWrite(PIN01, LOW);
       if (temperature>20.0) digitalWrite(PIN02, HIGH);
@@ -159,4 +171,3 @@ void loop()
   client.loop();
   delay(100);
 }
-
